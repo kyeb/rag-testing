@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - LLM_SERVICE_URL=llm-srv:50051
+    depends_on:
+      - llm-srv
+
+  llm-srv:
+    build:
+      context: ./llm-srv
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
