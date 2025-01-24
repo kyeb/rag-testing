@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 COPY requirements.txt .
@@ -8,4 +8,4 @@ RUN pip install watchdog
 COPY . .
 
 EXPOSE 50051
-CMD ["python", "-m", "watchdog", "server.py"]
+CMD ["python", "server.py"]
