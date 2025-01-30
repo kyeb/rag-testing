@@ -6,9 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-proto-types": "node scripts/generate-proto-types.js"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.12.5",
+    "@grpc/proto-loader": "^0.7.13",
     "draft-js": "^0.11.7",
     "next": "^15.1.6",
     "react": "^19.0.0",

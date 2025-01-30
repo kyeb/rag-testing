@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package edit;
+
+// Service for text editing
+service EditService {
+  // Edit takes a text input and returns a suggested edit
+  rpc Edit (EditRequest) returns (EditResponse) {}
+}
+
+// The request message containing the text to edit
+message EditRequest {
+  string text = 1;
+}
+
+// The response message containing the suggested edit
+message EditResponse {
+  string suggested_edit = 1;
+} 
