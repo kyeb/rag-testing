@@ -20,7 +20,6 @@ const proto = grpc.loadPackageDefinition(
 ) as unknown as ProtoGrpcType;
 
 const llmServiceUrl = process.env.LLM_SERVICE_URL || "localhost:50051";
-console.log("Connecting to LLM service at:", llmServiceUrl);
 
 export const editClient = new proto.edit.EditService(
   llmServiceUrl,
@@ -28,7 +27,6 @@ export const editClient = new proto.edit.EditService(
 );
 
 export const editText = (text: string): Promise<string> => {
-  console.log("Sending edit request with text:", text);
   return new Promise((resolve, reject) => {
     editClient.Edit(
       { text } as EditRequest,
@@ -37,19 +35,13 @@ export const editText = (text: string): Promise<string> => {
         response: EditResponse__Output | undefined
       ) => {
         if (error) {
-          console.error("gRPC error:", error.message);
-          console.error("Error details:", error.details);
-          console.error("Error code:", error.code);
           reject(error);
           return;
         }
-        console.log("Received response:", response);
         if (!response || !response.suggested_edit) {
-          console.error("Invalid response:", response);
           reject(new Error("No suggested edit received"));
           return;
         }
-        console.log("Suggested edit:", response.suggested_edit);
         resolve(response.suggested_edit);
       }
     );

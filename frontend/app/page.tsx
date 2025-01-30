@@ -43,7 +43,7 @@ export default function Home() {
       .join("\n");
 
     try {
-      const response = await fetch("/api/transform", {
+      const response = await fetch("/api/edit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
