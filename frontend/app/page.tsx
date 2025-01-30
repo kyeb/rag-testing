@@ -1,15 +1,83 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Editor, EditorState, Modifier, SelectionState } from "draft-js";
 import "draft-js/dist/Draft.css";
 
+interface FloatingButtonPosition {
+  top: number;
+  left: number;
+}
+
 export default function Home() {
   const [editorState, setEditorState] = useState<EditorState | null>(null);
+  const [buttonPosition, setButtonPosition] =
+    useState<FloatingButtonPosition | null>(null);
+  const [isButtonVisible, setIsButtonVisible] = useState(false);
+  const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setEditorState(EditorState.createEmpty());
+
+    // Add click outside handler
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        editorRef.current &&
+        !editorRef.current.contains(event.target as Node)
+      ) {
+        setIsButtonVisible(false);
+        setTimeout(() => setButtonPosition(null), 150);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
+
+  const updateButtonPosition = useCallback(() => {
+    if (!editorState) return;
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+      setIsButtonVisible(false);
+      setTimeout(() => setButtonPosition(null), 150);
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+
+    // Check if selection is within editor bounds
+    if (!editorRef.current?.contains(selection.anchorNode)) {
+      setIsButtonVisible(false);
+      setTimeout(() => setButtonPosition(null), 150);
+      return;
+    }
+
+    if (rect.width === 0) {
+      setIsButtonVisible(false);
+      setTimeout(() => setButtonPosition(null), 150);
+      return;
+    }
+
+    // Set position first, then trigger visibility
+    setButtonPosition({
+      top: rect.top - 25,
+      left: rect.left + rect.width / 2 - 50,
+    });
+
+    // Use RAF to ensure position is set before showing
+    requestAnimationFrame(() => {
+      setIsButtonVisible(true);
+    });
+  }, [editorState]);
+
+  const handleChange = (newState: EditorState) => {
+    setEditorState(newState);
+    setTimeout(updateButtonPosition, 0);
+  };
 
   const handleTransformClick = async () => {
     if (!editorState) return;
@@ -76,21 +144,35 @@ export default function Home() {
   if (!editorState) return null;
 
   return (
-    <div className="p-4">
+    <div className="p-4 relative">
       <h1 className="text-2xl font-bold mb-4">Draft.js Editor Example</h1>
-      <div className="border p-4 rounded-lg min-h-128 bg-white">
+      <div ref={editorRef} className="border p-4 rounded-lg min-h-128 bg-white">
         <Editor
           editorState={editorState}
-          onChange={setEditorState}
+          onChange={handleChange}
           placeholder="Start typing..."
         />
       </div>
-      <button
-        onClick={handleTransformClick}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+      <div
+        style={{
+          position: "fixed",
+          top: buttonPosition?.top ?? 0,
+          left: buttonPosition?.left ?? 0,
+          transform: "translate(-50%, -50%)",
+          zIndex: 1000,
+          opacity: isButtonVisible && buttonPosition ? 1 : 0,
+          transition: "opacity 150ms ease-in-out",
+          pointerEvents: isButtonVisible && buttonPosition ? "auto" : "none",
+          visibility: buttonPosition ? "visible" : "hidden",
+        }}
       >
-        Transform Selected Text
-      </button>
+        <button
+          onClick={handleTransformClick}
+          className="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-full hover:bg-blue-600 transition-colors shadow-lg"
+        >
+          Transform
+        </button>
+      </div>
     </div>
   );
 }
