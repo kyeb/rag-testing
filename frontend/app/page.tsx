@@ -12,11 +12,12 @@ export default function Home() {
   }, []);
 
   if (!editorState) return null;
+  console.log(editorState);
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Draft.js Editor Example</h1>
-      <div className="border p-4 rounded-lg min-h-[200px] bg-white">
+      <div className="border p-4 rounded-lg min-h-128 bg-white">
         <Editor
           editorState={editorState}
           onChange={setEditorState}

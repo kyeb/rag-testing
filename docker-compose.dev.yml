@@ -27,8 +27,12 @@ services:
       - "50051:50051"
     develop:
       watch:
-        - action: rebuild
-          path: ./llm-srv/requirements.txt
         - action: sync
-          target: /app
           path: ./llm-srv
+          target: /app
+          ignore:
+            - ".pytest_cache/"
+            - "__pycache__/"
+            - "*.pyc"
+        - action: rebuild
+          path: ./llm-srv/pyproject.toml
