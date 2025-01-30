@@ -1,6 +1,12 @@
 import grpc
 from concurrent import futures
 import logging
+import os
+import anthropic
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -12,6 +18,13 @@ class LLMServer:
     def __init__(self, port=50051):
         self.port = port
         self.server = None
+
+        # Initialize Anthropic client
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise ValueError("ANTHROPIC_API_KEY environment variable is required")
+        self.anthropic_client = anthropic.Anthropic(api_key=api_key)
+        logging.info("Initialized Anthropic client")
 
     def start(self):
         self.server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

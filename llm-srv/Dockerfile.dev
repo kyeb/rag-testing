@@ -14,20 +14,22 @@ RUN curl -sSL https://install.python-poetry.org | python3 - && \
     ln -s /opt/poetry/bin/poetry && \
     poetry --version
 
-# Copy Poetry configuration
-COPY pyproject.toml poetry.lock ./
-
 # Configure Poetry to not create a virtual environment
 RUN poetry config virtualenvs.create false
 
-# Install dependencies
+# Copy only dependency files first
+COPY pyproject.toml poetry.lock README.md ./
+
+# Install dependencies (this layer will be cached if dependencies don't change)
 RUN poetry install --no-root --with dev
 
-# Copy the rest of the application
-COPY . .
+# Copy the application code (this layer changes when code changes)
+COPY llm_srv ./llm_srv
+COPY tests ./tests
+COPY .env ./
 
 # Install the application
-RUN poetry install
+RUN poetry install --no-root
 
 # Expose the gRPC port
 EXPOSE 50051
