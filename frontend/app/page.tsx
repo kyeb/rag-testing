@@ -145,7 +145,7 @@ export default function Home() {
 
   return (
     <div className="p-4 relative">
-      <h1 className="text-2xl font-bold mb-4">Draft.js Editor Example</h1>
+      <h1 className="text-2xl font-bold mb-4">Transform your text with AI</h1>
       <div ref={editorRef} className="border p-4 rounded-lg min-h-128 bg-white">
         <Editor
           editorState={editorState}
@@ -170,7 +170,7 @@ export default function Home() {
           onClick={handleTransformClick}
           className="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-full hover:bg-blue-600 transition-colors shadow-lg"
         >
-          Transform
+          Improve
         </button>
       </div>
     </div>
