@@ -78,6 +78,9 @@ func main() {
 		pageURL := e.Request.URL.String()
 		log.Printf("Processing content from %s", pageURL)
 
+		// Strip anchor from URL
+		pageURL = strings.Split(pageURL, "#")[0]
+
 		title := e.DOM.Parent().Find("h1#firstHeading").Text()
 		if title == "" {
 			title = strings.TrimPrefix(e.Request.URL.Path, "/title/")
@@ -108,6 +111,9 @@ func main() {
 				href := el.Attr("href")
 				if strings.HasPrefix(href, "/title/") && !strings.Contains(href, ":") {
 					fullURL := baseURL + href
+
+					// Ignore anchor; they're just links to subheaders within a page
+					fullURL = strings.Split(fullURL, "#")[0]
 
 					linkCount++
 
