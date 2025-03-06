@@ -38,11 +38,23 @@ export default function MarkdownRenderer({
           ),
           li: ({ node, ...props }) => <li className="my-1" {...props} />,
           a: ({ node, href, children, ...props }: any) => {
-            // Relative link within the app
-            if (href && href.includes(".md")) {
-              const transformedHref = href.replace(/\.md$/, "");
+            // Check if href exists
+            if (!href) {
+              return <span {...props}>{children}</span>;
+            }
+
+            const isInternalLink = !href.includes("://");
+
+            if (isInternalLink) {
+              // Remove .md extension; our app sets up the routes without the .md
+              let internalHref = `/markdown/${href.replace(/\.md$/, "")}`;
+
               return (
-                <Link href={transformedHref} {...props}>
+                <Link
+                  href={internalHref}
+                  className="text-blue-600 hover:underline"
+                  {...props}
+                >
                   {children}
                 </Link>
               );
