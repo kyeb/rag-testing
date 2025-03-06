@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"bufio"
 	"fmt"
 	"net/url"
 	"os"
@@ -13,6 +14,23 @@ import (
 // Returns a list of error messages, or an empty list if all links are valid
 func ValidateLinks(outputDir string) []string {
 	var errors []string
+
+	// Load uncrawled links if they exist
+	uncrawledLinks := make(map[string]bool)
+	uncrawledFile := filepath.Join(outputDir, "uncrawled_links.txt")
+	if _, err := os.Stat(uncrawledFile); err == nil {
+		file, err := os.Open(uncrawledFile)
+		if err == nil {
+			scanner := bufio.NewScanner(file)
+			for scanner.Scan() {
+				parts := strings.Split(scanner.Text(), "\t")
+				if len(parts) > 0 {
+					uncrawledLinks[parts[0]] = true
+				}
+			}
+			file.Close()
+		}
+	}
 
 	// Regular expression to match markdown links
 	linkRegex := regexp.MustCompile(`\[([^\]]+)\]\(([^\)]+)\)`)
@@ -43,13 +61,31 @@ func ValidateLinks(outputDir string) []string {
 					if err != nil {
 						errors = append(errors, fmt.Sprintf("Invalid URL in %s: [%s](%s)", path, linkText, linkTarget))
 					}
+					// Skip validation for uncrawled links
+					if uncrawledLinks[linkTarget] {
+						continue
+					}
 					continue
 				}
 
 				// Handle relative links
 				targetPath := filepath.Join(filepath.Dir(path), linkTarget)
 				if _, err := os.Stat(targetPath); os.IsNotExist(err) {
-					errors = append(errors, fmt.Sprintf("Broken relative link in %s: [%s](%s) -> %s", path, linkText, linkTarget, targetPath))
+					// Convert relative path to absolute URL for checking against uncrawled links
+					relPath := strings.TrimSuffix(linkTarget, ".md")
+					if strings.HasPrefix(relPath, "../") {
+						// Handle relative paths that go up directories
+						parts := strings.Split(path, string(os.PathSeparator))
+						depth := strings.Count(relPath, "../")
+						if len(parts) > depth {
+							relPath = strings.TrimPrefix(relPath, strings.Repeat("../", depth))
+						}
+					}
+					absURL := "https://wiki.archlinux.org/title/" + relPath
+
+					if !uncrawledLinks[absURL] {
+						errors = append(errors, fmt.Sprintf("Broken relative link in %s: [%s](%s) -> %s", path, linkText, linkTarget, targetPath))
+					}
 				}
 			}
 		}
@@ -61,4 +97,4 @@ func ValidateLinks(outputDir string) []string {
 	}
 
 	return errors
-} 
+}
