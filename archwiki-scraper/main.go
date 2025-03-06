@@ -46,7 +46,8 @@ func main() {
 	c := colly.NewCollector(
 		colly.AllowedDomains("wiki.archlinux.org"),
 		colly.URLFilters(
-			regexp.MustCompile(`^https://wiki\.archlinux\.org/title/.*$`),
+			// Only match English pages - exclude pages with language codes like (简体中文) or (Español)
+			regexp.MustCompile(`^https://wiki\.archlinux\.org/title/[^(]+$`),
 		),
 		colly.UserAgent("Testing scraping tool (+mailto:scraping@kyeb.com)"),
 	)
@@ -180,21 +181,37 @@ func calculateRelativePath(fromFile, toFile string) string {
 }
 
 func convertWikiLinks(content, currentFile string) string {
-	re := regexp.MustCompile(`\[([^\]]+)\]\(/title/([^\)]+)\)`)
+	re := regexp.MustCompile(`\[([^\]]+)\]\(/title/([^#\)]+)(?:#([^\)]+))?\)`)
 	
 	return re.ReplaceAllStringFunc(content, func(match string) string {
 		submatches := re.FindStringSubmatch(match)
-		if len(submatches) != 3 {
+		if len(submatches) < 3 {
 			return match
 		}
 		
 		linkText := submatches[1]
 		wikiPath := submatches[2]
+		anchor := ""
+		if len(submatches) > 3 && submatches[3] != "" {
+			anchor = "#" + submatches[3]
+		}
+
+		// Get the relative path from current file to target file
+		currentDir := filepath.Dir(strings.TrimPrefix(currentFile, outputDir+"/"))
+		targetPath := wikiPath
 		
-		targetFile := filepath.Join(outputDir, wikiPath+".md")
-		relativePath := calculateRelativePath(currentFile, targetFile)
+		// Calculate relative path
+		var relPath string
+		if currentDir == "." {
+			relPath = targetPath + ".md"
+		} else {
+			// Count directory levels and add appropriate ../
+			depth := len(strings.Split(currentDir, "/"))
+			prefix := strings.Repeat("../", depth-1)
+			relPath = prefix + targetPath + ".md"
+		}
 		
-		return fmt.Sprintf("[%s](%s)", linkText, relativePath)
+		return fmt.Sprintf("[%s](%s%s)", linkText, relPath, anchor)
 	})
 }
 
