@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- Only add comments if the code in question is confusing or requires outside context to understand. Most code should be understandable from the naming, without comments needed.
