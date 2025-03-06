@@ -69,22 +69,55 @@ func ValidateLinks(outputDir string) []string {
 				}
 
 				// Handle relative links
-				targetPath := filepath.Join(filepath.Dir(path), linkTarget)
-				if _, err := os.Stat(targetPath); os.IsNotExist(err) {
-					// Convert relative path to absolute URL for checking against uncrawled links
-					relPath := strings.TrimSuffix(linkTarget, ".md")
-					if strings.HasPrefix(relPath, "../") {
-						// Handle relative paths that go up directories
-						parts := strings.Split(path, string(os.PathSeparator))
-						depth := strings.Count(relPath, "../")
-						if len(parts) > depth {
-							relPath = strings.TrimPrefix(relPath, strings.Repeat("../", depth))
+				if strings.Contains(linkTarget, "#") {
+					parts := strings.Split(linkTarget, "#")
+					linkTarget = parts[0]
+					anchor := parts[1]
+
+					// Check if the file exists
+					targetPath := filepath.Join(filepath.Dir(path), linkTarget)
+					if _, err := os.Stat(targetPath); os.IsNotExist(err) {
+						// Convert relative path to absolute URL for checking against uncrawled links
+						relPath := strings.TrimSuffix(linkTarget, ".md")
+						if strings.HasPrefix(relPath, "../") {
+							// Handle relative paths that go up directories
+							parts := strings.Split(path, string(os.PathSeparator))
+							depth := strings.Count(relPath, "../")
+							if len(parts) > depth {
+								relPath = strings.TrimPrefix(relPath, strings.Repeat("../", depth))
+							}
+						}
+						absURL := "https://wiki.archlinux.org/title/" + relPath
+
+						if !uncrawledLinks[absURL] {
+							errors = append(errors, fmt.Sprintf("Broken relative link in %s: [%s](%s) -> %s", path, linkText, linkTarget, targetPath))
+						}
+					} else {
+						// Check if the anchor exists in the file
+						content, err := os.ReadFile(targetPath)
+						if err == nil && !headerExists(string(content), anchor) {
+							errors = append(errors, fmt.Sprintf("Broken anchor in %s: [%s](%s) -> %s", path, linkText, linkTarget, targetPath))
 						}
 					}
-					absURL := "https://wiki.archlinux.org/title/" + relPath
+				} else {
+					// Handle links without anchors
+					targetPath := filepath.Join(filepath.Dir(path), linkTarget)
+					if _, err := os.Stat(targetPath); os.IsNotExist(err) {
+						// Convert relative path to absolute URL for checking against uncrawled links
+						relPath := strings.TrimSuffix(linkTarget, ".md")
+						if strings.HasPrefix(relPath, "../") {
+							// Handle relative paths that go up directories
+							parts := strings.Split(path, string(os.PathSeparator))
+							depth := strings.Count(relPath, "../")
+							if len(parts) > depth {
+								relPath = strings.TrimPrefix(relPath, strings.Repeat("../", depth))
+							}
+						}
+						absURL := "https://wiki.archlinux.org/title/" + relPath
 
-					if !uncrawledLinks[absURL] {
-						errors = append(errors, fmt.Sprintf("Broken relative link in %s: [%s](%s) -> %s", path, linkText, linkTarget, targetPath))
+						if !uncrawledLinks[absURL] {
+							errors = append(errors, fmt.Sprintf("Broken relative link in %s: [%s](%s) -> %s", path, linkText, linkTarget, targetPath))
+						}
 					}
 				}
 			}
@@ -97,4 +130,10 @@ func ValidateLinks(outputDir string) []string {
 	}
 
 	return errors
+}
+
+// Function to check if a header exists in the file
+func headerExists(content string, anchor string) bool {
+	headerRegex := regexp.MustCompile(`(?m)^#+\s+` + regexp.QuoteMeta(anchor) + `$`)
+	return headerRegex.MatchString(content)
 }
