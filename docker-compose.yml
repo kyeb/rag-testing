@@ -9,6 +9,8 @@ services:
       - "3000:3000"
     environment:
       - LLM_SERVICE_URL=llm-srv:50051
+    volumes:
+      - ./archwiki-scraper/output:/content
     depends_on:
       - llm-srv
 

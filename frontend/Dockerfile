@@ -1,11 +1,19 @@
-FROM node:18-alpine
+FROM node:22.13.1-alpine
 
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+
+# Copy package.json and yarn configuration
+COPY package.json .yarnrc.yml yarn.lock ./
+
+# Enable corepack to use the correct Yarn version from packageManager field
+RUN corepack enable && corepack prepare
+
+# Install dependencies
+RUN yarn install --immutable
+
 COPY . .
 
-RUN npm run build
+RUN yarn build
 
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["yarn", "start"]
