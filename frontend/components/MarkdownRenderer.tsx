@@ -1,7 +1,5 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { nord } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import Link from 'next/link';
 
 interface MarkdownRendererProps {
@@ -55,23 +53,15 @@ export default function MarkdownRenderer({ content, className = '' }: MarkdownRe
           blockquote: props => (
             <blockquote className="border-l-4 border-gray-300 pl-4 italic my-2" {...props} />
           ),
-          code: ({ className, children, ...props }) => {
-            const match = /language-(\w+)/.exec(className || '');
-            return match ? (
-              <SyntaxHighlighter
-                style={nord}
-                language={match[1]}
-                PreTag="div"
-                className="rounded-md my-4"
-                {...props}
-              >
-                {String(children).replace(/\n$/, '')}
-              </SyntaxHighlighter>
-            ) : (
-              <code className="bg-gray-100 px-1 rounded text-sm" {...props}>
+          pre: ({ children }) => {
+            return (
+              <pre className="bg-gray-100 p-2 rounded-sm block font-mono text-sm my-2">
                 {children}
-              </code>
+              </pre>
             );
+          },
+          code: ({ children }) => {
+            return <span className="bg-gray-100 p-1 rounded-sm font-mono text-xs">{children}</span>;
           },
         }}
       >
