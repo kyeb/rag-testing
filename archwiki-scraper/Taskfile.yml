@@ -33,3 +33,9 @@ tasks:
     desc: Validate markdown links in the output directory
     cmds:
       - go run ./cmd/validate output/
+
+  crawl:full:
+    desc: Perform a full crawl of the Arch Wiki (depth=1000)
+    cmds:
+      - task clean
+      - go run . --depth 100 --max-files 10000 --output output

@@ -19,9 +19,10 @@ import (
 var (
 	baseURL     = "https://wiki.archlinux.org"
 	outputDir   string
-	maxDepth    = flag.Int("depth", 1000, "maximum crawl depth")
+	maxDepth    = flag.Int("depth", 100, "maximum crawl depth")
 	concurrent  = flag.Int("concurrent", 5, "number of concurrent scrapers")
 	rateLimit   = flag.Duration("rate", 5*time.Second, "time to wait between requests")
+	maxFiles    = flag.Int("max-files", 100, "maximum number of files to scrape")
 )
 
 var (
