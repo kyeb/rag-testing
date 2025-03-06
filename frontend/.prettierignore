@@ -1,0 +1,12 @@
+node_modules
+.yarn
+.next
+out
+.vercel
+
+dist
+build
+
+protos
+
+tailwind.config.ts

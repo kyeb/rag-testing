@@ -1,90 +1,62 @@
-import React from "react";
-import ReactMarkdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { nord } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import Link from "next/link";
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { nord } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import Link from 'next/link';
 
 interface MarkdownRendererProps {
   content: string;
   className?: string;
 }
 
-export default function MarkdownRenderer({
-  content,
-  className = "",
-}: MarkdownRendererProps) {
+export default function MarkdownRenderer({ content, className = '' }: MarkdownRendererProps) {
   return (
-    <div className={`prose prose-slate lg:prose-lg max-w-none ${className}`}>
+    <div className={`prose max-w-none dark:prose-invert ${className}`}>
       <ReactMarkdown
         components={{
-          h1: ({ node, ...props }) => (
-            <h1 className="text-3xl font-bold my-4" {...props} />
-          ),
-          h2: ({ node, ...props }) => (
-            <h2 className="text-2xl font-bold my-3" {...props} />
-          ),
-          h3: ({ node, ...props }) => (
-            <h3 className="text-xl font-bold my-2" {...props} />
-          ),
-          h4: ({ node, ...props }) => (
-            <h4 className="text-lg font-bold my-2" {...props} />
-          ),
-          p: ({ node, ...props }) => <p className="my-2" {...props} />,
-          ul: ({ node, ...props }) => (
-            <ul className="list-disc pl-5 my-2" {...props} />
-          ),
-          ol: ({ node, ...props }) => (
-            <ol className="list-decimal pl-5 my-2" {...props} />
-          ),
-          li: ({ node, ...props }) => <li className="my-1" {...props} />,
-          a: ({ node, href, children, ...props }: any) => {
+          h1: props => <h1 className="text-3xl font-bold my-4" {...props} />,
+          h2: props => <h2 className="text-2xl font-bold my-3" {...props} />,
+          h3: props => <h3 className="text-xl font-bold my-2" {...props} />,
+          h4: props => <h4 className="text-lg font-bold my-2" {...props} />,
+          p: props => <p className="my-2" {...props} />,
+          ul: props => <ul className="list-disc pl-5 my-2" {...props} />,
+          ol: props => <ol className="list-decimal pl-5 my-2" {...props} />,
+          li: props => <li className="my-1" {...props} />,
+          a: ({ href, children, ...props }) => {
             // Check if href exists
             if (!href) {
               return <span {...props}>{children}</span>;
             }
 
-            const isInternalLink = !href.includes("://");
-
-            if (isInternalLink) {
-              // Remove .md extension; our app sets up the routes without the .md
-              let internalHref = `/markdown/${href.replace(/\.md$/, "")}`;
-
+            // Check if external link
+            const isExternal = href.startsWith('http://') || href.startsWith('https://');
+            if (isExternal) {
               return (
-                <Link
-                  href={internalHref}
-                  className="text-blue-600 hover:underline"
-                  {...props}
-                >
+                <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
                   {children}
-                </Link>
+                </a>
               );
             }
 
-            // External link
+            // Handle relative links
+            let internalHref = href;
+            if (internalHref.endsWith('.md')) {
+              internalHref = internalHref.replace('.md', '');
+            }
+
             return (
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-                {...props}
-              >
+              <Link href={internalHref} className="text-blue-600 hover:underline" {...props}>
                 {children}
-              </a>
+              </Link>
             );
           },
-          em: ({ node, ...props }) => <em className="italic" {...props} />,
-          strong: ({ node, ...props }) => (
-            <strong className="font-bold" {...props} />
+          em: props => <em className="italic" {...props} />,
+          strong: props => <strong className="font-bold" {...props} />,
+          blockquote: props => (
+            <blockquote className="border-l-4 border-gray-300 pl-4 italic my-2" {...props} />
           ),
-          blockquote: ({ node, ...props }) => (
-            <blockquote
-              className="border-l-4 border-gray-300 pl-4 italic my-2"
-              {...props}
-            />
-          ),
-          code: ({ node, className, children, ...props }: any) => {
-            const match = /language-(\w+)/.exec(className || "");
+          code: ({ className, children, ...props }) => {
+            const match = /language-(\w+)/.exec(className || '');
             return match ? (
               <SyntaxHighlighter
                 style={nord}
@@ -93,7 +65,7 @@ export default function MarkdownRenderer({
                 className="rounded-md my-4"
                 {...props}
               >
-                {String(children).replace(/\n$/, "")}
+                {String(children).replace(/\n$/, '')}
               </SyntaxHighlighter>
             ) : (
               <code className="bg-gray-100 px-1 rounded text-sm" {...props}>

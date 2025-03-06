@@ -14,4 +14,4 @@ export interface MarkdownDirectory {
   path: string;
 }
 
-export type MarkdownItem = MarkdownFile | MarkdownDirectory; 
+export type MarkdownItem = MarkdownFile | MarkdownDirectory;

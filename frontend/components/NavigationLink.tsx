@@ -1,5 +1,5 @@
-import React from "react";
-import Link from "next/link";
+import React from 'react';
+import Link from 'next/link';
 
 interface NavigationLinkProps {
   href: string;
@@ -9,10 +9,7 @@ interface NavigationLinkProps {
 export default function NavigationLink({ href, label }: NavigationLinkProps) {
   return (
     <div className="mb-4">
-      <Link
-        href={href}
-        className="inline-flex items-center text-blue-500 hover:text-blue-700"
-      >
+      <Link href={href} className="inline-flex items-center text-blue-500 hover:text-blue-700">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { Editor, EditorState, Modifier, SelectionState } from "draft-js";
-import "draft-js/dist/Draft.css";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Editor, EditorState, Modifier } from 'draft-js';
+import 'draft-js/dist/Draft.css';
 
 interface FloatingButtonPosition {
   top: number;
@@ -11,8 +11,7 @@ interface FloatingButtonPosition {
 
 export default function Home() {
   const [editorState, setEditorState] = useState<EditorState | null>(null);
-  const [buttonPosition, setButtonPosition] =
-    useState<FloatingButtonPosition | null>(null);
+  const [buttonPosition, setButtonPosition] = useState<FloatingButtonPosition | null>(null);
   const [isButtonVisible, setIsButtonVisible] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -21,18 +20,15 @@ export default function Home() {
 
     // Add click outside handler
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        editorRef.current &&
-        !editorRef.current.contains(event.target as Node)
-      ) {
+      if (editorRef.current && !editorRef.current.contains(event.target as Node)) {
         setIsButtonVisible(false);
         setTimeout(() => setButtonPosition(null), 150);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -86,7 +82,7 @@ export default function Home() {
     const content = editorState.getCurrentContent();
 
     if (!selection || !content || selection.isCollapsed()) {
-      alert("Please select some text first!");
+      alert('Please select some text first!');
       return;
     }
 
@@ -94,27 +90,21 @@ export default function Home() {
       .getBlockMap()
       .skipUntil((_, k) => k === selection.getStartKey())
       .takeUntil((_, k) => k === selection.getEndKey())
-      .concat([
-        [selection.getEndKey(), content.getBlockForKey(selection.getEndKey())],
-      ])
-      .map((block) => {
-        if (!block) return "";
+      .concat([[selection.getEndKey(), content.getBlockForKey(selection.getEndKey())]])
+      .map(block => {
+        if (!block) return '';
         const key = block.getKey();
-        const start =
-          key === selection.getStartKey() ? selection.getStartOffset() : 0;
-        const end =
-          key === selection.getEndKey()
-            ? selection.getEndOffset()
-            : block.getLength();
+        const start = key === selection.getStartKey() ? selection.getStartOffset() : 0;
+        const end = key === selection.getEndKey() ? selection.getEndOffset() : block.getLength();
         return block.getText().slice(start, end);
       })
-      .join("\n");
+      .join('\n');
 
     try {
-      const response = await fetch("/api/edit", {
-        method: "POST",
+      const response = await fetch('/api/edit', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ text: selectedText }),
       });
@@ -131,13 +121,13 @@ export default function Home() {
       const newEditorState = EditorState.push(
         editorState,
         contentWithReplacedText,
-        "insert-characters"
+        'insert-characters'
       );
 
       setEditorState(newEditorState);
     } catch (error) {
-      console.error("Error transforming text:", error);
-      alert("Failed to transform text. Please try again.");
+      console.error('Error transforming text:', error);
+      alert('Failed to transform text. Please try again.');
     }
   };
 
@@ -147,23 +137,19 @@ export default function Home() {
     <div className="p-4 relative">
       <h1 className="text-2xl font-bold mb-4">Transform your text with AI</h1>
       <div ref={editorRef} className="border p-4 rounded-lg min-h-128 bg-white">
-        <Editor
-          editorState={editorState}
-          onChange={handleChange}
-          placeholder="Start typing..."
-        />
+        <Editor editorState={editorState} onChange={handleChange} placeholder="Start typing..." />
       </div>
       <div
         style={{
-          position: "fixed",
+          position: 'fixed',
           top: buttonPosition?.top ?? 0,
           left: buttonPosition?.left ?? 0,
-          transform: "translate(-50%, -50%)",
+          transform: 'translate(-50%, -50%)',
           zIndex: 1000,
           opacity: isButtonVisible && buttonPosition ? 1 : 0,
-          transition: "opacity 150ms ease-in-out",
-          pointerEvents: isButtonVisible && buttonPosition ? "auto" : "none",
-          visibility: buttonPosition ? "visible" : "hidden",
+          transition: 'opacity 150ms ease-in-out',
+          pointerEvents: isButtonVisible && buttonPosition ? 'auto' : 'none',
+          visibility: buttonPosition ? 'visible' : 'hidden',
         }}
       >
         <button

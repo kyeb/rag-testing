@@ -1,11 +1,7 @@
-import { notFound } from "next/navigation";
-import {
-  formatSlug,
-  pathExists,
-  getMarkdownContent,
-} from "@/lib/markdown-utils";
-import MarkdownLayout from "@/components/MarkdownLayout";
-import MarkdownRenderer from "@/components/MarkdownRenderer";
+import { notFound } from 'next/navigation';
+import { formatSlug, getMarkdownContent } from '@/lib/markdown-utils';
+import MarkdownLayout from '@/components/MarkdownLayout';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 interface MarkdownInFolderPageProps {
   params: {
@@ -14,9 +10,7 @@ interface MarkdownInFolderPageProps {
   };
 }
 
-export default async function MarkdownInFolderPage({
-  params,
-}: MarkdownInFolderPageProps) {
+export default async function MarkdownInFolderPage({ params }: MarkdownInFolderPageProps) {
   const { folderName, slug } = params;
 
   const markdownData = await getMarkdownContent(slug, folderName);

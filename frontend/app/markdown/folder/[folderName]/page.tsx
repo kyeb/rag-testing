@@ -1,10 +1,10 @@
-import fs from "fs/promises";
-import path from "path";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { MARKDOWN_DIR, formatSlug, pathExists } from "@/lib/markdown-utils";
-import MarkdownLayout from "@/components/MarkdownLayout";
-import ErrorDisplay from "@/components/ErrorDisplay";
+import fs from 'fs/promises';
+import path from 'path';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { MARKDOWN_DIR, formatSlug, pathExists } from '@/lib/markdown-utils';
+import MarkdownLayout from '@/components/MarkdownLayout';
+import ErrorDisplay from '@/components/ErrorDisplay';
 
 interface FolderPageProps {
   params: {
@@ -42,25 +42,25 @@ export default async function FolderPage({ params }: FolderPageProps) {
 
   // Filter for markdown files
   const markdownFiles = items
-    .filter((item) => !item.isDirectory() && item.name.endsWith(".md"))
-    .map((item) => ({
-      name: item.name.replace(".md", ""),
+    .filter(item => !item.isDirectory() && item.name.endsWith('.md'))
+    .map(item => ({
+      name: item.name.replace('.md', ''),
       path: `/markdown/folder/${encodeURIComponent(
         folderName
-      )}/${encodeURIComponent(item.name.replace(".md", ""))}`,
+      )}/${encodeURIComponent(item.name.replace('.md', ''))}`,
     }));
 
   return (
     <MarkdownLayout
       title={`Folder: ${formatSlug(folderName)}`}
       backLink={{
-        href: "/markdown",
-        label: "Back to all files",
+        href: '/markdown',
+        label: 'Back to all files',
       }}
     >
       <div className="grid gap-4">
         {markdownFiles.length > 0 ? (
-          markdownFiles.map((file) => (
+          markdownFiles.map(file => (
             <Link
               key={file.name}
               href={file.path}

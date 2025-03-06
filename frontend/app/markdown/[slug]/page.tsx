@@ -1,14 +1,12 @@
-import { notFound } from "next/navigation";
+import { notFound } from 'next/navigation';
 import {
   MARKDOWN_DIR,
-  formatSlug,
   pathExists,
   listMarkdownFiles,
   getMarkdownContent,
-} from "@/lib/markdown-utils";
-import ErrorDisplay from "@/components/ErrorDisplay";
-import MarkdownLayout from "@/components/MarkdownLayout";
-import MarkdownRenderer from "@/components/MarkdownRenderer";
+} from '@/lib/markdown-utils';
+import MarkdownLayout from '@/components/MarkdownLayout';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 interface MarkdownPageProps {
   params: {
@@ -33,8 +31,8 @@ export default async function MarkdownPage({ params }: MarkdownPageProps) {
       title={title}
       date={frontmatter.date}
       backLink={{
-        href: "/markdown",
-        label: "Back to list",
+        href: '/markdown',
+        label: 'Back to list',
       }}
     >
       <MarkdownRenderer content={content} />
@@ -51,11 +49,11 @@ export async function generateStaticParams() {
   try {
     const markdownFiles = await listMarkdownFiles();
 
-    return markdownFiles.map((filename) => ({
-      slug: filename.replace(".md", ""),
+    return markdownFiles.map(filename => ({
+      slug: filename.replace('.md', ''),
     }));
   } catch (error) {
-    console.error("Error reading markdown directory:", error);
+    console.error('Error reading markdown directory:', error);
     return [];
   }
 }

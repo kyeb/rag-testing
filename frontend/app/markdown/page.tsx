@@ -1,10 +1,6 @@
-import Link from "next/link";
-import {
-  MARKDOWN_DIR,
-  pathExists,
-  listDirectoryContents,
-} from "@/lib/markdown-utils";
-import ErrorDisplay from "@/components/ErrorDisplay";
+import Link from 'next/link';
+import { MARKDOWN_DIR, pathExists, listDirectoryContents } from '@/lib/markdown-utils';
+import ErrorDisplay from '@/components/ErrorDisplay';
 
 export default async function MarkdownListingPage() {
   // Ensure directory exists before reading
@@ -39,7 +35,7 @@ export default async function MarkdownListingPage() {
 
       <div className="grid gap-4">
         {allItems.length > 0 ? (
-          allItems.map((item) => (
+          allItems.map(item => (
             <Link
               href={item.path}
               key={item.name}
@@ -78,9 +74,7 @@ export default async function MarkdownListingPage() {
                     <polyline points="14 2 14 8 20 8"></polyline>
                   </svg>
                 )}
-                <span>
-                  {item.isDirectory ? item.name : item.name.replace(".md", "")}
-                </span>
+                <span>{item.isDirectory ? item.name : item.name.replace('.md', '')}</span>
               </div>
             </Link>
           ))
