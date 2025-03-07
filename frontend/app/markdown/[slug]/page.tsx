@@ -25,11 +25,12 @@ export default async function MarkdownPage({ params }: MarkdownPageProps) {
   }
 
   const { title, content, frontmatter } = markdownData;
+  const date = frontmatter.date as string;
 
   return (
     <MarkdownLayout
       title={title}
-      date={frontmatter.date}
+      date={date}
       backLink={{
         href: '/markdown',
         label: 'Back to list',
