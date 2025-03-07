@@ -4,14 +4,15 @@ import MarkdownLayout from '@/components/MarkdownLayout';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 interface MarkdownInFolderPageProps {
-  params: {
+  params: Promise<{
     folderName: string;
     slug: string;
-  };
+  }>;
 }
 
 export default async function MarkdownInFolderPage({ params }: MarkdownInFolderPageProps) {
-  const { folderName, slug } = params;
+  const resolvedParams = await params;
+  const { folderName, slug } = resolvedParams;
 
   const markdownData = await getMarkdownContent(slug, folderName);
 

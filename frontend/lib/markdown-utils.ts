@@ -162,7 +162,7 @@ export async function getMarkdownContent(
   try {
     const fileContent = await readMarkdownFile(filePath);
     const { frontmatter, markdown } = parseFrontMatter(fileContent);
-    const title = frontmatter.title || formatSlug(slug);
+    const title = (frontmatter.title as string) || formatSlug(slug);
 
     return {
       title,

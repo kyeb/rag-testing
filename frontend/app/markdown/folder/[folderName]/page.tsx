@@ -7,14 +7,14 @@ import MarkdownLayout from '@/components/MarkdownLayout';
 import ErrorDisplay from '@/components/ErrorDisplay';
 
 interface FolderPageProps {
-  params: {
+  params: Promise<{
     folderName: string;
-  };
+  }>;
 }
 
 export default async function FolderPage({ params }: FolderPageProps) {
   // Ensure params are fully resolved
-  const resolvedParams = await Promise.resolve(params);
+  const resolvedParams = await params;
   const { folderName } = resolvedParams;
 
   const folderPath = path.join(MARKDOWN_DIR, folderName);

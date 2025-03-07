@@ -9,13 +9,13 @@ import MarkdownLayout from '@/components/MarkdownLayout';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 
 interface MarkdownPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default async function MarkdownPage({ params }: MarkdownPageProps) {
-  const resolvedParams = await Promise.resolve(params);
+  const resolvedParams = await params;
   const { slug } = resolvedParams;
 
   const markdownData = await getMarkdownContent(slug);
